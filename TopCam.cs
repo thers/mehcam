@@ -84,15 +84,13 @@ namespace topcam3
 
             var rx = Game.GetControlNormal(0, (Control)239);
             var ry = Game.GetControlNormal(0, (Control)240);
-            var rv = new Vector3((rx - .5f)*2, (ry - .5f)*2, .5f);
+            var rv = new Vector3(rx, ry, .15f);
 
             var curWorldPos = camPos;
-            var farPos = Vector3.Unproject(rv, 0, 0, 2, 2, near, far, camMatrix * projection);
-            farPos = FuccProjection.ScreenToWorld(rv, camera);
+            var farPos = FuccProjection.ScreenToWorld(rv, camera);
             var farWorldPos = farPos;
             
-            var projected = Vector3.Project(pos + rv, 0, 0, 2, 2, near, far, camMatrix * projection);
-            projected = FuccProjection.WorldToScreen(pos + rv, camera);
+            var projected = FuccProjection.WorldToScreen(pos + rv, camera);
 
             var wp = World.Raycast(
                 curWorldPos,
@@ -106,10 +104,10 @@ namespace topcam3
             DrawLine(curWorldPos, farWorldPos);
             DrawCube(wp.HitPosition - new Vector3(.5f, .5f, 0f), new Vector3(.1f), 255, 0, 0);
 
-            var revProj = FuccProjection.ScreenToWorld(FuccProjection.WorldToScreen(pos, camera), camera);
-            DrawCube(revProj - new Vector3(-.1f, -.1f, 0), new Vector3(1f), 0, 255, 0);
+            var revProj = FuccProjection.WorldToScreen(pos, camera);
+            //DrawCube(revProj - new Vector3(-.1f, -.1f, 0), new Vector3(1f), 0, 255, 0);
 
-            txt.Caption = "Ped pos, unprojected -> projected: " + VectorToString(revProj);
+            txt.Caption = "Ped pos, projected: " + VectorToString(revProj);
             txt.Draw();
 
             //txt2.Caption = "Projected to camera: " + String.Join(", ", projected.ToArray().Select((v) => v.ToString("f04")));

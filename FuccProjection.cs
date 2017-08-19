@@ -50,17 +50,26 @@ namespace topcam3
             var matrix = Matrix.Invert(CamWorldToView(world) * projection);
             
             // Image pos to screen space
-            var screenSpacePos = pos;
+            var screenSpacePos = new Vector3(
+                pos.X * 2 - 1f,
+                1f - pos.Y * 2,
+                pos.Z
+            );
 
-            return FuccVector3.RowMajor_ApplyMatrix(pos, matrix);
+            return FuccVector3.RowMajor_ApplyMatrix(screenSpacePos, matrix);
         }
 
         public static Matrix CamWorldToView(Matrix world)
         {
             var view = world;
+
             view.M41 = -view.M41;
             view.M42 = -view.M42;
             view.M43 = -view.M43;
+
+            view.M14 = 1f;
+            view.M24 = 1f;
+            view.M34 = 1f;
 
             return view;
         }

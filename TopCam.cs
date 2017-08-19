@@ -63,14 +63,13 @@ namespace topcam3
         public static string Asset = "scr_rcbarry1";
         public static string ParticleEffectName = "scr_alien_teleport";
 
+        public float offsetY = 0f;
+
         public async Task OnTick()
-        {
-            var sw = Screen.Width;
-            var sh = Screen.Height;
-            
+        {            
             var pos = LocalPedPos = LocalPlayer.Character.Position;
 
-            var camPos =  Vector3.Add(pos, new Vector3(2, 0, 5f));
+            var camPos =  Vector3.Add(pos, new Vector3(2, offsetY, 2));
             if (!inited)
             {
                 inited = true;
@@ -78,7 +77,7 @@ namespace topcam3
                 camera = World.CreateCamera(
                     camPos,
                     new Vector3(0f, 0f, 0f),
-                    60f
+                    170f
                 );
                 Call(Hash.RENDER_SCRIPT_CAMS, true, true, 1000, false, false);
 
@@ -89,22 +88,15 @@ namespace topcam3
             camera.PointAt(LocalPlayer.Character);
 
             var camRot = Call<Vector3>(Hash.GET_CAM_ROT, camera, 2);
-            var camMatrix = camera.GetMatrix();
-            
-            var projection = camera.GetProjection();
 
             var rx = Game.GetControlNormal(0, (Control)239);
             var ry = Game.GetControlNormal(0, (Control)240);
-            var rv = new Vector3(rx, ry, 1.5f);
-
-            var curWorldPos = camPos;
-            var farPos = FuccProjection.ScreenToWorld(new Vector2(rx, ry), camera);
-            var farWorldPos = farPos - Vector3.Normalize(curWorldPos - farPos) * 100f;
             
-            var projected = FuccProjection.WorldToScreen(pos + rv, camera);
+            var farPos = FuccProjection.ScreenToWorld(new Vector2(rx, ry), camera);
+            var farWorldPos = farPos - Vector3.Normalize(camPos - farPos) * 100f;
 
             var wp = World.Raycast(
-                curWorldPos,
+                camPos,
                 farWorldPos,
                 IntersectOptions.Map
             );
@@ -112,28 +104,22 @@ namespace topcam3
             //txt.Caption = curWorldPos.ToString();
             //txt2.Caption = farWorldPos.ToString();
 
-            DrawLine(curWorldPos, farWorldPos);
+            DrawLine(camPos, farWorldPos);
             DrawCube(wp.HitPosition, new Vector3(.1f), 255, 0, 0);
-
-            //txt.Caption = "Mouse pos, normalized: " + VectorToString(new Vector3(
-            //    rv.X * 2 - 1f,
-            //    1f - rv.Y * 2,
-            //    rv.Z
-            //));
-            //txt.Draw();
 
             //txt2.Caption = "Projected to camera: " + String.Join(", ", projected.ToArray().Select((v) => v.ToString("f04")));
             //var hitProjected = FuccProjection.WorldToScreen(wp.HitPosition, camera);
             //txt2.Caption = "Projected hit to camera: " + VectorToString(hitProjected);
             //txt2.Draw();
 
-            //txt3.Caption = "Far pos, unprojected: " + VectorToString(farPos);
-            //txt3.Draw();
+            txt3.Caption = "Cam rot: " + VectorToString(camera.Rotation);
+            txt3.Draw();
 
             //txt4.Caption = "Ped pos: " + VectorToString(pos);
             //txt4.Draw();
 
 
+            var camMatrix = camera.GetMatrix();
             
             DrawMatrix("cam matrix", camMatrix, 10, 10, 255, 0, 0);
             DrawMatrix("cam view matrix", FuccProjection.CamWorldToView(camMatrix), 10, 100, 215, 58, 73);
@@ -165,10 +151,21 @@ namespace topcam3
 
                 PTFX.StartNonLoopedAtCoord(ParticleEffectName, hit + new Vector3(0, 0, 1f));
             }
+            if (Game.IsControlJustPressed(0, Control.WeaponWheelNext))
+            {
+                offsetY += 0.1f;
+            }
+            if (Game.IsControlJustPressed(0, Control.WeaponWheelPrev))
+            {
+                offsetY -= 0.1f;
+            }
 
             if (Call<bool>(Hash.IS_CAM_RENDERING, camera))
             {
                 Game.DisableControlThisFrame(0, Control.Attack);
+                Game.DisableControlThisFrame(0, Control.WeaponWheelNext);
+                Game.DisableControlThisFrame(0, Control.WeaponWheelPrev);
+                Screen.Hud.HideComponentThisFrame(HudComponent.WeaponWheel);
             }
 
             LocalPlayer.CanControlCharacter = true;

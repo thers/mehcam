@@ -62,29 +62,6 @@ namespace topcam3
         public static Matrix CamWorldToView(Matrix world)
         {
             return Matrix.LookAtLH((Vector3)world.Row4, TopCam.LocalPedPos, world.Up);
-
-            var view = world;
-
-            //view.M41 = -view.M41;
-            //view.M42 = -view.M42;
-            //view.M43 = -view.M43;
-
-            view.M14 = 1f;
-            view.M24 = 1f;
-            view.M34 = 1f;
-
-            return view;
-        }
-
-        public static Matrix CamWorldToView2(Matrix world)
-        {
-            var view = world;
-
-            view.M14 = 1f;
-            view.M24 = 1f;
-            view.M34 = 1f;
-
-            return view;
         }
     }
 }

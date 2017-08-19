@@ -22,7 +22,7 @@ namespace topcam3
         }
 
         public static Vector3 WorldToScreen(Vector3 pos, Camera camera) =>
-            WorldToScreen(pos, camera.GetMatrix(), camera.Projection());
+            WorldToScreen(pos, camera.GetMatrix(), camera.GetProjection());
 
         public static Vector3 WorldToScreen(Vector3 pos, Matrix world, Matrix projection)
         {
@@ -42,7 +42,7 @@ namespace topcam3
             ScreenToWorld(new Vector3(pos, .5f), camera);
 
         public static Vector3 ScreenToWorld(Vector3 pos, Camera camera) =>
-            ScreenToWorld(pos, camera.GetMatrix(), camera.Projection());
+            ScreenToWorld(pos, camera.GetMatrix(), camera.GetProjection());
 
         public static Vector3 ScreenToWorld(Vector3 pos, Matrix world, Matrix projection)
         {
@@ -52,7 +52,7 @@ namespace topcam3
             // Image pos to screen space
             var screenSpacePos = new Vector3(
                 pos.X * 2 - 1f,
-                1f - pos.Y * 2,
+                pos.Y * 2 - 1f,
                 pos.Z
             );
 
@@ -61,7 +61,7 @@ namespace topcam3
 
         public static Matrix CamWorldToView(Matrix world)
         {
-            var view = world;
+            var view = Matrix.Invert(world);
 
             view.M41 = -view.M41;
             view.M42 = -view.M42;

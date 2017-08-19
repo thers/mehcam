@@ -75,16 +75,15 @@ namespace topcam3
             }
             camera.Position = camPos;
             camera.PointAt(LocalPlayer.Character);
+
             var camRot = Call<Vector3>(Hash.GET_CAM_ROT, camera, 2);
             var camMatrix = camera.GetMatrix();
             
-            var near = camera.NearClip;
-            var far = camera.FarClip;
-            var projection = camera.Projection();
+            var projection = camera.GetProjection();
 
             var rx = Game.GetControlNormal(0, (Control)239);
             var ry = Game.GetControlNormal(0, (Control)240);
-            var rv = new Vector3(rx, ry, .15f);
+            var rv = new Vector3(rx, ry, 1.5f);
 
             var curWorldPos = camPos;
             var farPos = FuccProjection.ScreenToWorld(rv, camera);
@@ -107,7 +106,11 @@ namespace topcam3
             var revProj = FuccProjection.WorldToScreen(pos, camera);
             //DrawCube(revProj - new Vector3(-.1f, -.1f, 0), new Vector3(1f), 0, 255, 0);
 
-            txt.Caption = "Ped pos, projected: " + VectorToString(revProj);
+            txt.Caption = "Mouse pos, normalized: " + VectorToString(new Vector3(
+                rv.X * 2 - 1f,
+                rv.Y * 2 - 1f,
+                rv.Z
+            ));
             txt.Draw();
 
             //txt2.Caption = "Projected to camera: " + String.Join(", ", projected.ToArray().Select((v) => v.ToString("f04")));
@@ -129,6 +132,11 @@ namespace topcam3
             //DrawMatrix("projection.Inverse", Matrix.Invert(projection), 10, 300, 255, 0, 255);
             //DrawMatrix("cam matrix * projection.Inverse", camMatrix * Matrix.Invert(projection), 10, 400, 0, 92, 197);
 
+            // Frustum
+            DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(-1f, 1f, .1f), camera), 0xff, 0xaa, 0);
+            DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(1f, 1f, .1f), camera), 0xff, 0xaa, 0);
+            DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(1f, -1f, .1f), camera), 0xff, 0xaa, 0);
+            DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(-1f, -1f, .1f), camera), 0xff, 0xaa, 0);
 
             Call(Hash._SHOW_CURSOR_THIS_FRAME, new InputArgument[0]);
 
@@ -237,7 +245,7 @@ namespace topcam3
         }
 
         #region DRAW
-        private static void DrawHelper(Camera cam, Matrix projection, Matrix world)
+        private static void DrawHelper(Camera cam)
         {
             var camPos = cam.Position;
             var camRot = cam.Rotation;
@@ -252,7 +260,7 @@ namespace topcam3
 
             var setPoint = new Action<string, float, float, float>((id, x, y, z) => {
                 //points.Add(id, ApplyMatrix(new Vector3(x, y, z), camProjectionMatrix2));
-                points.Add(id, Unproject(0, 0, 1, 1, cam.NearClip, cam.FarClip, new Vector3(x, y, z), projection, world));
+                points.Add(id, FuccProjection.ScreenToWorld(new Vector3(x, y, z), cam));
             });
             var addLine = new Action<string, string, int[]>((id1, id2, c) => {
                 var from = camPos;

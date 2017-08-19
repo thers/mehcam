@@ -124,10 +124,9 @@ namespace topcam3
             txt4.Draw();
 
 
-
-
+            
             //DrawMatrix("projection", projection, 10, 10, 255, 0, 0);
-            DrawMatrix("cam matrix", camMatrix, 10, 100, 215, 58, 73);
+            DrawMatrix("cam view matrix", FuccProjection.CamWorldToView(camMatrix), 10, 100, 215, 58, 73);
             //DrawMatrix("cam matrix", camMatrix, 10, 200, 200, 225, 255);
             //DrawMatrix("projection.Inverse", Matrix.Invert(projection), 10, 300, 255, 0, 255);
             //DrawMatrix("cam matrix * projection.Inverse", camMatrix * Matrix.Invert(projection), 10, 400, 0, 92, 197);

@@ -27,7 +27,7 @@ namespace topcam3
         public static Vector3 WorldToScreen(Vector3 pos, Matrix world, Matrix projection)
         {
             // Make transformation matrix
-            var matrix = world * projection;
+            var matrix = CamWorldToView(world) * projection;
 
             // Translate world pos to screen space pos
             var screenSpacePos = FuccVector3.RowMajor_ApplyMatrix(pos, matrix);
@@ -47,12 +47,22 @@ namespace topcam3
         public static Vector3 ScreenToWorld(Vector3 pos, Matrix world, Matrix projection)
         {
             // Make transformation matrix
-            var matrix = Matrix.Invert(world * projection);
+            var matrix = Matrix.Invert(CamWorldToView(world) * projection);
             
             // Image pos to screen space
             var screenSpacePos = pos;
 
             return FuccVector3.RowMajor_ApplyMatrix(pos, matrix);
+        }
+
+        public static Matrix CamWorldToView(Matrix world)
+        {
+            var view = world;
+            view.M41 = -view.M41;
+            view.M42 = -view.M42;
+            view.M43 = -view.M43;
+
+            return view;
         }
     }
 }

@@ -23,7 +23,7 @@ namespace topcam3
         public static Matrix GetMatrix(this Camera cam)
         {
             var pos = cam.Position;
-            var rot = Function.Call<Vector3>(Hash.GET_CAM_ROT, cam, 0);
+            var rot = Function.Call<Vector3>(Hash.GET_CAM_ROT, cam, 2);
 
             return FuccMatrix.Create(pos, rot);
         }

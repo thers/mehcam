@@ -20,6 +20,7 @@ namespace topcam3
                 {
                     Call(Hash.RENDER_SCRIPT_CAMS, false, true, 1000, false, false);
                     Call(Hash.DESTROY_CAM, camera.Handle);
+                    Bitch.Delete();
                 }
             });
 
@@ -54,14 +55,22 @@ namespace topcam3
 
         private int i = 0;
 
+        public static Vector3 LocalPedPos;
+
+        public Ped Bitch;
+        public ParticleEffectsAsset PTFX;
+
+        public static string Asset = "scr_rcbarry1";
+        public static string ParticleEffectName = "scr_alien_teleport";
+
         public async Task OnTick()
         {
             var sw = Screen.Width;
             var sh = Screen.Height;
+            
+            var pos = LocalPedPos = LocalPlayer.Character.Position;
 
-            var pos = LocalPlayer.Character.Position;
-
-            var camPos =  Vector3.Add(pos, new Vector3(0, -2, 2));
+            var camPos =  Vector3.Add(pos, new Vector3(2, 0, 5f));
             if (!inited)
             {
                 inited = true;
@@ -72,6 +81,9 @@ namespace topcam3
                     60f
                 );
                 Call(Hash.RENDER_SCRIPT_CAMS, true, true, 1000, false, false);
+
+                Bitch = await World.CreatePed(new Model(PedHash.Beach01AFY), camPos);
+                PTFX = new ParticleEffectsAsset(Asset);
             }
             camera.Position = camPos;
             camera.PointAt(LocalPlayer.Character);
@@ -86,57 +98,55 @@ namespace topcam3
             var rv = new Vector3(rx, ry, 1.5f);
 
             var curWorldPos = camPos;
-            var farPos = FuccProjection.ScreenToWorld(rv, camera);
-            var farWorldPos = farPos;
+            var farPos = FuccProjection.ScreenToWorld(new Vector2(rx, ry), camera);
+            var farWorldPos = farPos - Vector3.Normalize(curWorldPos - farPos) * 100f;
             
             var projected = FuccProjection.WorldToScreen(pos + rv, camera);
 
             var wp = World.Raycast(
                 curWorldPos,
-                farWorldPos - Vector3.Normalize(curWorldPos - farWorldPos) * 100f,
+                farWorldPos,
                 IntersectOptions.Map
             );
 
-            txt.Caption = curWorldPos.ToString();
-            txt2.Caption = farWorldPos.ToString();
+            //txt.Caption = curWorldPos.ToString();
+            //txt2.Caption = farWorldPos.ToString();
 
             DrawLine(curWorldPos, farWorldPos);
-            DrawCube(wp.HitPosition - new Vector3(.5f, .5f, 0f), new Vector3(.1f), 255, 0, 0);
+            DrawCube(wp.HitPosition, new Vector3(.1f), 255, 0, 0);
 
-            var revProj = FuccProjection.WorldToScreen(pos, camera);
-            //DrawCube(revProj - new Vector3(-.1f, -.1f, 0), new Vector3(1f), 0, 255, 0);
-
-            txt.Caption = "Mouse pos, normalized: " + VectorToString(new Vector3(
-                rv.X * 2 - 1f,
-                rv.Y * 2 - 1f,
-                rv.Z
-            ));
-            txt.Draw();
+            //txt.Caption = "Mouse pos, normalized: " + VectorToString(new Vector3(
+            //    rv.X * 2 - 1f,
+            //    1f - rv.Y * 2,
+            //    rv.Z
+            //));
+            //txt.Draw();
 
             //txt2.Caption = "Projected to camera: " + String.Join(", ", projected.ToArray().Select((v) => v.ToString("f04")));
-            var hitProjected = FuccProjection.WorldToScreen(wp.HitPosition, camera);
-            txt2.Caption = "Projected hit to camera: " + VectorToString(hitProjected);
-            txt2.Draw();
+            //var hitProjected = FuccProjection.WorldToScreen(wp.HitPosition, camera);
+            //txt2.Caption = "Projected hit to camera: " + VectorToString(hitProjected);
+            //txt2.Draw();
 
-            txt3.Caption = "Far pos, unprojected: " + VectorToString(farPos);
-            txt3.Draw();
+            //txt3.Caption = "Far pos, unprojected: " + VectorToString(farPos);
+            //txt3.Draw();
 
-            txt4.Caption = "Ped pos: " + VectorToString(pos);
-            txt4.Draw();
+            //txt4.Caption = "Ped pos: " + VectorToString(pos);
+            //txt4.Draw();
 
 
             
-            //DrawMatrix("projection", projection, 10, 10, 255, 0, 0);
+            DrawMatrix("cam matrix", camMatrix, 10, 10, 255, 0, 0);
             DrawMatrix("cam view matrix", FuccProjection.CamWorldToView(camMatrix), 10, 100, 215, 58, 73);
-            //DrawMatrix("cam matrix", camMatrix, 10, 200, 200, 225, 255);
-            //DrawMatrix("projection.Inverse", Matrix.Invert(projection), 10, 300, 255, 0, 255);
+            //DrawMatrix("cam rot matrix from euler", Matrix.Invert(Matrix.RotationQuaternion(FuccQuaternion.CreateFromEuler(camRot))), 10, 200, 200, 225, 255);
+            //DrawMatrix("cam rot lookat", Matrix.LookAtLH(camPos, pos, new Vector3(0,0,1)), 10, 300, 255, 0, 255);
             //DrawMatrix("cam matrix * projection.Inverse", camMatrix * Matrix.Invert(projection), 10, 400, 0, 92, 197);
 
             // Frustum
-            DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(-1f, 1f, .1f), camera), 0xff, 0xaa, 0);
-            DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(1f, 1f, .1f), camera), 0xff, 0xaa, 0);
-            DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(1f, -1f, .1f), camera), 0xff, 0xaa, 0);
-            DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(-1f, -1f, .1f), camera), 0xff, 0xaa, 0);
+            DrawHelper(camera);
+            //DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(-1f, 1f, 0f), camera), 0xff, 0xaa, 0);
+            //DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(1f, 1f, .5f), camera), 0xff, 0xaa, 0);
+            //DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(1f, -1f, .5f), camera), 0xff, 0xaa, 0);
+            //DrawLine(camPos, FuccProjection.ScreenToWorld(new Vector3(-1f, -1f, .5f), camera), 0xff, 0xaa, 0);
 
             Call(Hash._SHOW_CURSOR_THIS_FRAME, new InputArgument[0]);
 
@@ -148,82 +158,26 @@ namespace topcam3
             {
                 Call(Hash.RENDER_SCRIPT_CAMS, false, true, 1000, false, false);
             }
-
-            DrawCoords(pos, LocalPlayer.Character.Rotation, sw, sh);
-            DrawCoords(pos + new Vector3(0, 0, 1f), Vector3.Zero, sw, sh);
-            DrawCoords(camPos, camRot, sw, sh);
-            DrawCoords(camPos + new Vector3(0, 0, 1f), Vector3.Zero, sw, sh);
-        }
-
-        #region MONOGAME
-        private static bool WithinEpsilon(float a, float b)
-        {
-            float num = a - b;
-            return ((-1.401298E-45f <= num) && (num <= float.Epsilon));
-        }
-
-        public static Vector3 Project(
-            float x,
-            float y,
-            float width,
-            float height,
-            float minDepth,
-            float maxDepth,
-            Vector3 source,
-            Matrix projection,
-            Matrix world
-        )
-        {
-            Matrix matrix = world * projection;
-            Vector3 vector = FuccVector3.RowMajor_ApplyMatrix(source, matrix);
-
-            float a = (((source.X * matrix.M14) + (source.Y * matrix.M24)) + (source.Z * matrix.M34)) + matrix.M44;
-
-            if (!WithinEpsilon(a, 1f))
+            if (Game.IsControlJustPressed(0, Control.Attack))
             {
-                vector.X = vector.X / a;
-                vector.Y = vector.Y / a;
-                vector.Z = vector.Z / a;
-            }
-            vector.X = (((vector.X + 1f) * 0.5f) * width) + x;
-            vector.Y = (((-vector.Y + 1f) * 0.5f) * height) + y;
-            vector.Z = (vector.Z * (maxDepth - minDepth)) + minDepth;
+                var hit = wp.HitPosition;
+                Bitch.Task.GoTo(hit);
 
-            return vector;
-        }
-
-        public static Vector3 Unproject(
-            float x,
-            float y,
-            float width,
-            float height,
-            float minDepth,
-            float maxDepth, 
-            Vector3 source,
-            Matrix projection,
-            Matrix world
-        )
-        {
-            Matrix matrix = Matrix.Invert(world * projection);
-
-            source.X = (((source.X - x) / ((float)width)) * 2f) - 1f;
-            source.Y = -((((source.Y - y) / ((float)height)) * 2f) - 1f);
-            source.Z = (source.Z - minDepth) / (maxDepth - minDepth);
-
-            Vector3 vector = FuccVector3.RowMajor_ApplyMatrix(source, matrix);
-
-            float a = (((source.X * matrix.M14) + (source.Y * matrix.M24)) + (source.Z * matrix.M34)) + matrix.M44;
-
-            if (!WithinEpsilon(a, 1f))
-            {
-                vector.X = vector.X / a;
-                vector.Y = vector.Y / a;
-                vector.Z = vector.Z / a;
+                PTFX.StartNonLoopedAtCoord(ParticleEffectName, hit + new Vector3(0, 0, 1f));
             }
 
-            return vector;
+            if (Call<bool>(Hash.IS_CAM_RENDERING, camera))
+            {
+                Game.DisableControlThisFrame(0, Control.Attack);
+            }
+
+            LocalPlayer.CanControlCharacter = true;
+
+            //DrawCoords(pos, LocalPlayer.Character.Rotation, sw, sh);
+            //DrawCoords(pos + new Vector3(0, 0, 1f), Vector3.Zero, sw, sh);
+            //DrawCoords(camPos, camRot, sw, sh);
+            //DrawCoords(camPos + new Vector3(0, 0, 1f), Vector3.Zero, sw, sh);
         }
-        #endregion
 
         public static string MatrixToString(Matrix m)
         {
@@ -332,13 +286,6 @@ namespace topcam3
             addLine("n2", "f2", colorFrustum);
             addLine("n3", "f3", colorFrustum);
             addLine("n4", "f4", colorFrustum);
-
-            // cone
-
-            addLine("p", "n1", colorCone);
-            addLine("p", "n2", colorCone);
-            addLine("p", "n3", colorCone);
-            addLine("p", "n4", colorCone);
 
             // up
 

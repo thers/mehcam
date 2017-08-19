@@ -22,7 +22,7 @@ namespace topcam3
 
         public static Matrix CreateProjection(float fov, float aspect, float near, float far)
         {
-            return Matrix.PerspectiveFovLH(fov, aspect, near, far);
+            return Matrix.PerspectiveFovLH(FuccQuaternion.Deg2Rad * fov, aspect, near, far);
         }
 
         public static Matrix Mono_CreatePerspective(float fov, float aspect, float near, float far)

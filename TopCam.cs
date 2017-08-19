@@ -153,11 +153,11 @@ namespace topcam3
             }
             if (Game.IsControlJustPressed(0, Control.WeaponWheelNext))
             {
-                offsetY += 0.1f;
+                offsetY += 0.2f;
             }
             if (Game.IsControlJustPressed(0, Control.WeaponWheelPrev))
             {
-                offsetY -= 0.1f;
+                offsetY -= 0.2f;
             }
 
             if (Call<bool>(Hash.IS_CAM_RENDERING, camera))
@@ -172,7 +172,7 @@ namespace topcam3
 
             //DrawCoords(pos, LocalPlayer.Character.Rotation, sw, sh);
             //DrawCoords(pos + new Vector3(0, 0, 1f), Vector3.Zero, sw, sh);
-            //DrawCoords(camPos, camRot, sw, sh);
+            DrawCoords(camPos, camRot, Screen.Width, Screen.Height);
             //DrawCoords(camPos + new Vector3(0, 0, 1f), Vector3.Zero, sw, sh);
         }
 

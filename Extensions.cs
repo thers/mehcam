@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CitizenFX.Core;
-using CitizenFX.Core.UI;
-using CitizenFX.Core.Native;
+﻿using CitizenFX.Core;
 
 namespace topcam3
 {
@@ -16,19 +9,16 @@ namespace topcam3
             var pos = ent.Position;
             var rot = ent.Rotation;
 
-            return FuccMatrix.Create(pos, rot);
+            return ExtraMatrix.Create(pos, rot);
         }
 
+        public static Matrix GetProjection(this Camera cam)
+            => Projection.GetForCamera(cam);
 
-        public static Matrix GetMatrix(this Camera cam)
+
+        public static Vector3 GlobalPositionFromOffset(this Camera cam, Vector3 offset)
         {
-            var pos = cam.Position;
-            var rot = Function.Call<Vector3>(Hash.GET_CAM_ROT, cam, 2);
-
-            return FuccMatrix.Create(pos, rot);
+            return Vector3.TransformCoordinate(offset, ExtraMatrix.Create(cam.Position, cam.Rotation));
         }
-
-
-        public static Matrix GetProjection(this Camera cam) => FuccProjection.GetForCamera(cam);
     }
 }

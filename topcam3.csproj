@@ -30,7 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CitizenFX.Core">
+    <Reference Include="CitizenFX.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\canary\FiveM.app\citizen\clr2\lib\mono\4.5\CitizenFX.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -44,10 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions.cs" />
-    <Compile Include="FuccMatrix.cs" />
-    <Compile Include="FuccProjection.cs" />
-    <Compile Include="FuccQuaternion.cs" />
-    <Compile Include="FuccVector3.cs" />
+    <Compile Include="ExtraMatrix.cs" />
+    <Compile Include="Projection.cs" />
+    <Compile Include="ExtraQuaternion.cs" />
+    <Compile Include="ExtraVector3.cs" />
     <Compile Include="TopCam.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

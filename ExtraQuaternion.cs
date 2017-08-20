@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CitizenFX.Core;
 
 namespace topcam3
 {
-    class FuccQuaternion
+    class ExtraQuaternion
     {
         public static float Deg2Rad = (float)(Math.PI / 180f);
 
